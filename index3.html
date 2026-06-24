@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tシャツ プリント発注フォーム</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    background: #F7F7F5;
+    color: #1A1A1A;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  header {
+    background: #1A1A1A;
+    color: #F7F7F5;
+    padding: 24px 40px;
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+  header h1 { font-size: 18px; font-weight: 700; letter-spacing: 0.08em; }
+  header span { font-size: 12px; color: #888; letter-spacing: 0.05em; }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 40px 20px 80px; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: #888;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    margin-top: 40px;
+  }
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  @media (max-width: 600px) { .info-grid { grid-template-columns: 1fr; } }
+  .field label {
+    display: block;
+    font-size: 11px;
+    color: #666;
+    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+  }
+  .field input[type="text"],
+  .field input[type="email"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #DDDDD8;
+    border-radius: 4px;
+    font-size: 14px;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .field input:focus { border-color: #1A1A1A; }
+
+  /* 商品カード */
+  .product-block {
+    background: #fff;
+    border: 1px solid #E8E8E4;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 180px 1fr;
+  }
+  @media (max-width: 700px) {
+    .product-block { grid-template-columns: 1fr; }
+  }
+
+  .product-image {
+    background: #F0F0EC;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    border-right: 1px solid #E8E8E4;
+  }
+  .product-image img {
+    width: 100%;
+    max-width: 156px;
+    height: 156px;
+    object-fit: contain;
+    display: block;
+  }
+  .product-image .no-image {
+    width: 156px;
+    height: 156px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #CCC;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+  }
+
+  .product-right { display: flex; flex-direction: column; }
+
+  .product-header {
+    background: #1A1A1A;
+    color: #F7F7F5;
+    padding: 10px 16px;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .product-header .design-name { font-size: 13px; font-weight: 700; letter-spacing: 0.06em; }
+  .product-header .design-color { font-size: 11px; color: #AAA; }
+
+  .size-header {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    background: #F0F0EC;
+    border-bottom: 1px solid #E8E8E4;
+  }
+  .size-header .sh-size {
+    padding: 6px 0;
+    font-size: 10px;
+    color: #666;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-align: center;
+    border-left: 1px solid #E8E8E4;
+  }
+  .size-header .sh-size:first-child { border-left: none; }
+
+  .size-row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    flex: 1;
+  }
+  .size-cell {
+    padding: 12px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    border-left: 1px solid #F0F0EC;
+    border-top: 1px solid #F0F0EC;
+  }
+  .size-cell:first-child { border-left: none; }
+  .size-cell .size-label { font-size: 10px; color: #999; font-weight: 600; }
+  .size-cell input[type="number"] {
+    width: 52px;
+    text-align: center;
+    padding: 7px 4px;
+    border: 1px solid #DDDDD8;
+    border-radius: 3px;
+    font-size: 15px;
+    background: #fff;
+    outline: none;
+    -moz-appearance: textfield;
+  }
+  .size-cell input[type="number"]::-webkit-inner-spin-button,
+  .size-cell input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .size-cell input[type="number"]:focus { border-color: #1A1A1A; }
+  .size-cell input[type="number"].has-value {
+    border-color: #1A1A1A;
+    background: #F5F5F0;
+    font-weight: 700;
+  }
+
+  /* 送信エリア */
+  .submit-area {
+    margin-top: 40px;
+    padding: 24px;
+    background: #fff;
+    border: 1px solid #E8E8E4;
+    border-radius: 6px;
+  }
+  .order-summary { font-size: 13px; color: #444; margin-bottom: 16px; min-height: 20px; }
+  .order-summary strong { color: #1A1A1A; }
+
+  .btn-submit {
+    width: 100%;
+    padding: 14px;
+    background: #1A1A1A;
+    color: #F7F7F5;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-submit:hover { background: #333; }
+  .btn-submit:disabled { background: #CCC; cursor: not-allowed; }
+
+  #complete-screen {
+    display: none;
+    text-align: center;
+    padding: 80px 20px;
+  }
+  #complete-screen .check { font-size: 48px; margin-bottom: 16px; }
+  #complete-screen h2 { font-size: 20px; margin-bottom: 8px; }
+  #complete-screen p { color: #666; font-size: 14px; }
+
+  .error-msg { color: #C0392B; font-size: 12px; margin-top: 4px; display: none; }
+  .loading { display: none; text-align: center; padding: 12px; color: #888; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>PRINT ORDER FORM</h1>
+  <span>Tシャツ プリント発注</span>
+</header>
+
+<div class="container">
+  <div id="order-form">
+
+    <div class="section-label">発注者情報</div>
+    <div class="info-grid">
+      <div class="field">
+        <label>お名前 *</label>
+        <input type="text" id="name" placeholder="山田 太郎">
+        <div class="error-msg" id="err-name">お名前を入力してください</div>
+      </div>
+      <div class="field">
+        <label>メールアドレス *</label>
+        <input type="email" id="email" placeholder="your@email.com">
+        <div class="error-msg" id="err-email">正しいメールアドレスを入力してください</div>
+      </div>
+    </div>
+    <div class="field">
+      <label>備考（任意）</label>
+      <input type="text" id="note" placeholder="納期・その他連絡事項など"
+        style="width:100%;padding:10px 12px;border:1px solid #DDDDD8;border-radius:4px;font-size:14px;background:#fff;outline:none;">
+    </div>
+
+    <div class="section-label" style="margin-top:40px">商品・数量入力</div>
+    <div id="products-container"></div>
+
+    <div class="submit-area">
+      <div class="order-summary" id="order-summary">数量を入力してください</div>
+      <button class="btn-submit" id="btn-submit" onclick="submitOrder()">発注を送信する</button>
+      <div class="loading" id="loading">送信中...</div>
+    </div>
+
+  </div>
+
+  <div id="complete-screen">
+    <div class="check">✓</div>
+    <h2>発注を受け付けました</h2>
+    <p id="complete-msg">確認メールをお送りしました。</p>
+  </div>
+</div>
+
+<script>
+const PRODUCTS = [
+  { design: 'SUSHI2',  color: 'ホワイト', skuBase: 'T-WHI-SUSHI2', img: 'images/T-WHI-SUSHI2_.png' },
+  { design: 'SUSHI2',  color: 'ブラック', skuBase: 'T-BLK-SUSHI2', img: 'images/T-BLK-SUSHI2_.png' },
+  { design: 'SUSHI2',  color: 'ベージュ', skuBase: 'T-BEI-SUSHI2', img: 'images/T-BEI-SUSHI2.png' },
+  { design: 'SHIME',   color: 'ブラック', skuBase: 'T-BLK-SHIME',  img: 'images/T-BLK-SHIME.png' },
+  { design: 'SHIME',   color: 'ベージュ', skuBase: 'T-BEI-SHIME',  img: 'images/T-BEI-SHIME.png' },
+  { design: 'SHIME2',  color: 'ベージュ', skuBase: 'T-BEI-SHIME2', img: 'images/T-BEI-SHIME2.png' },
+  { design: 'SUSHI',   color: 'ブラック', skuBase: 'T-BLK-SUSHI',  img: 'images/T-BLK-SUSHI.png' },
+  { design: 'SUSHI3',  color: 'ブラック', skuBase: 'T-BLK-SUSHI3', img: 'images/T-BLK-SUSHI3.png' },
+  { design: 'SUSHI3',  color: 'ホワイト', skuBase: 'T-WHI-SUSHI3', img: 'images/T-WHI-SUSHI3_.png' },
+  { design: 'SUSHI3',  color: 'ベージュ', skuBase: 'T-BEI-SUSHI3', img: 'images/T-BEI-SUSHI3.png' },
+  { design: 'HELL',    color: 'ホワイト', skuBase: 'T-WHI-HELL',   img: 'images/T-WHI-HELL.png' },
+  { design: 'HELL',    color: 'ブラック', skuBase: 'T-BLK-HELL',   img: 'images/T-BLK-HELL.png' },
+  { design: 'DAR',     color: 'ブラック', skuBase: 'T-BLK-DAR',    img: 'images/T-BLK-DAR.png' },
+  { design: 'DAR',     color: 'ベージュ', skuBase: 'T-BEI-DAR',    img: 'images/T-BEI-DAR.png' },
+  { design: 'SAK1',    color: 'ホワイト', skuBase: 'T-WHI-SAK1',   img: 'images/T-WHI-SAK1.png' },
+  { design: 'SAK2',    color: 'ホワイト', skuBase: 'T-WHI-SAK2',   img: 'images/T-WHI-SAK2.png' },
+  { design: 'SAK2',    color: 'ベージュ', skuBase: 'T-BEI-SAK2',   img: 'images/T-BEI-SAK2.png' },
+  { design: 'SAK3',    color: 'ホワイト', skuBase: 'T-WHI-SAK3',   img: 'images/T-WHI-SAK3.png' },
+  { design: 'SAK3',    color: 'ベージュ', skuBase: 'T-BEI-SAK3',   img: 'images/T-BEI-SAK3.png' },
+];
+
+const SIZES = ['XS', 'S', 'M', 'L', 'XL', '2XL'];
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyMZJA9BFnmXQklnAB1pd1K258167G0A0NTJwxxFRj-vGBV2sCfRQ4bZhNAf90ofXFV/exec';
+
+function buildUI() {
+  const container = document.getElementById('products-container');
+
+  PRODUCTS.forEach(p => {
+    const block = document.createElement('div');
+    block.className = 'product-block';
+
+    const imgHTML = p.img
+      ? `<img src="${p.img}" alt="${p.design} ${p.color}" onerror="this.parentNode.innerHTML='<div class=\\'no-image\\'>NO IMAGE</div>'">`
+      : `<div class="no-image">NO IMAGE</div>`;
+
+    block.innerHTML = `
+      <div class="product-image">${imgHTML}</div>
+      <div class="product-right">
+        <div class="product-header">
+          <span class="design-name">${p.design}</span>
+          <span class="design-color">${p.color}</span>
+        </div>
+        <div class="size-header">
+          ${SIZES.map(s => `<div class="sh-size">${s}</div>`).join('')}
+        </div>
+        <div class="size-row">
+          ${SIZES.map(size => {
+            const skuId = `${p.skuBase}-${size}`.replace(/\s/g, '_');
+            return `
+              <div class="size-cell">
+                <span class="size-label">${size}</span>
+                <input type="number" min="0" max="999" value=""
+                  id="qty_${skuId}"
+                  data-sku="${p.skuBase} -${size}"
+                  data-design="${p.design}"
+                  data-color="${p.color}"
+                  data-size="${size}"
+                  placeholder="0"
+                  oninput="onQtyChange(this)">
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+    container.appendChild(block);
+  });
+}
+
+function onQtyChange(input) {
+  const val = parseInt(input.value) || 0;
+  if (val > 0) input.classList.add('has-value');
+  else { input.classList.remove('has-value'); input.value = ''; }
+  updateSummary();
+}
+
+function updateSummary() {
+  const items = getOrderItems();
+  const total = items.reduce((sum, i) => sum + i.qty, 0);
+  const el = document.getElementById('order-summary');
+  el.innerHTML = total === 0
+    ? '数量を入力してください'
+    : `<strong>${items.length}種類 合計 ${total}枚</strong> を発注します`;
+}
+
+function getOrderItems() {
+  const inputs = document.querySelectorAll('input[data-sku]');
+  const items = [];
+  inputs.forEach(input => {
+    const qty = parseInt(input.value) || 0;
+    if (qty > 0) items.push({
+      sku: input.dataset.sku,
+      design: input.dataset.design,
+      color: input.dataset.color,
+      size: input.dataset.size,
+      qty: qty
+    });
+  });
+  return items;
+}
+
+function validate() {
+  let ok = true;
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  document.getElementById('err-name').style.display = name ? 'none' : 'block';
+  document.getElementById('err-email').style.display =
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? 'none' : 'block';
+  if (!name) ok = false;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) ok = false;
+  if (getOrderItems().length === 0) { alert('1点以上数量を入力してください。'); ok = false; }
+  return ok;
+}
+
+async function submitOrder() {
+  if (!validate()) return;
+  const btn = document.getElementById('btn-submit');
+  const loading = document.getElementById('loading');
+  btn.disabled = true;
+  loading.style.display = 'block';
+
+  const payload = {
+    name: document.getElementById('name').value.trim(),
+    email: document.getElementById('email').value.trim(),
+    note: document.getElementById('note').value.trim(),
+    items: getOrderItems(),
+    timestamp: new Date().toISOString()
+  };
+
+  try {
+    await fetch(GAS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    document.getElementById('order-form').style.display = 'none';
+    const complete = document.getElementById('complete-screen');
+    complete.style.display = 'block';
+    document.getElementById('complete-msg').textContent =
+      `${payload.email} に確認メールをお送りしました。`;
+  } catch (e) {
+    alert('送信中にエラーが発生しました。もう一度お試しください。');
+    btn.disabled = false;
+    loading.style.display = 'none';
+  }
+}
+
+buildUI();
+updateSummary();
+</script>
+</body>
+</html>
